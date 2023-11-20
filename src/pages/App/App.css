@@ -1,0 +1,23 @@
+#App h1,button {
+    margin: 3vh;
+}
+
+.dad.text {
+    font-size: 7vh;
+}
+.or.text {
+    font-size: 5.5vh;
+}
+
+#openBtn {
+    font-size: 4vh;
+    background-color: #00B2FF;
+    font-weight: 800;
+    border: none;
+    padding: 2vh;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+#openBtn:active {
+    background-color: #0086c0;
+}

@@ -1,0 +1,26 @@
+.controlIcon {
+    background-color: #00000000;
+    width: 25px;
+    height: 25px;
+    background-size: cover;
+    border-radius: 0;
+    padding: 0;
+    margin: 1vh;
+}
+
+.controlIcon img {
+    width: 100%;
+    height: 100%;
+}
+
+#VolumeDiv #volume {
+    cursor: pointer;
+    width: 0;
+    transition: 0.2s;
+    opacity: 0;
+}
+
+#VolumeDiv.canFold:hover #volume {
+    width: calc(100% - calc(2vh + 25px));
+    opacity: 1;
+}

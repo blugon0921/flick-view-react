@@ -1,0 +1,125 @@
+{
+  "name": "flick_view",
+  "version": "2.0.0",
+  "author": "Blugon",
+  "private": true,
+  "main": "public/electron.js",
+  "homepage": "./",
+  "dependencies": {
+    "@electron/remote": "^2.0.11",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "electron-is-dev": "^2.0.0",
+    "electron-log": "^4.4.8",
+    "electron-progressbar": "^2.1.0",
+    "electron-updater": "^6.1.1",
+    "ffmpeg-static-electron": "^2.0.3",
+    "fluent-ffmpeg": "^2.1.2",
+    "mime": "^3.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-player": "^2.12.0",
+    "react-scripts": "5.0.1",
+    "styled-components": "^6.0.7",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^26.1.0",
+    "electron-builder": "^24.6.3",
+    "wait-on": "^7.0.1",
+    "bun-types": "latest"
+  },
+  "scripts": {
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "start": "concurrently \"cross-env NODE_ENV=development BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build": "npm run react-build && electron-builder build -c.extraMetadata.main=build/electron.js",
+    "release": "npm run react-build && electron-builder --publish=always"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blugon0921/FlickView_React"
+  },
+  "build": {
+    "productName": "Flick View",
+    "appId": "kr.blugon.flickview",
+    "publish": {
+      "provider": "github",
+      "owner": "blugon0921",
+      "repo": "FlickView_React",
+      "releaseType": "release"
+    },
+    "asar": true,
+    "mac": {
+      "target": [
+        "default"
+      ],
+      "icon": "build/icon.icns"
+    },
+    "dmg": {
+      "title": "Flick View",
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/favicon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": false,
+      "perMachine": true,
+      "language": 1042,
+      "installerIcon": "build/favicon.ico",
+      "shortcutName": "Flick View",
+      "artifactName": "Flick-View-${version}.${ext}",
+      "uninstallDisplayName": "Flick View"
+    },
+    "directories": {
+      "buildResources": "./build/",
+      "output": "./dist/"
+    },
+    "fileAssociations": [
+      {
+        "ext": [
+          "webm",
+          "ogv",
+          "mov",
+          "mp4",
+          "m4v",
+          "mkv"
+        ],
+        "name": "Video File",
+        "role": "Editor"
+      }
+    ]
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
