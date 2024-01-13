@@ -5,15 +5,14 @@ import App from './pages/App/App';
 import reportWebVitals from './reportWebVitals';
 import { OPEN_FILE, OPEN_VIDEO, FULL_SCREEN, VIDEOS_IN_PATH_RESPONSE, VIDEOS_IN_PATH, ALERT } from "./constants";
 import Playing from "./pages/Playing/Playing";
-import pause from "./controllvideo/pause";
-import seek from "./controllvideo/seek";
 // import { setInValue, setStorage, storageItem } from "./modules";
 import { setInValue, setStorage, storageItem } from "./modules"
 const { ipcRenderer } = window.require("electron")
 
 let root = ReactDOM.createRoot(document.getElementById('root'))
 
-global.id = -1
+// global.id = -1
+global.id = 0
 
 ipcRenderer.on("setId", (event, args) => {
   const isDev = args[1]
@@ -30,38 +29,20 @@ if(!storageItem("volume")) {
   setStorage("volume", 50)
 }
 
-document.body.addEventListener("keydown", (event) => {
+document.addEventListener("keydown", (event) => {
   if(document.activeElement.tagName === "VIDEO") return
   if(document.getElementsByTagName("video")[0]) {
-    // console.log(event.key)
-    pause(event) //Pause/Play
-    seek(event) //Seek/Rewind
-    if(event.ctrlKey) {
-      if(event.key === "s") {
-        event.preventDefault()
-        setStorage("sidebar", setInValue(storageItem("sidebar"), "isOpen", !storageItem("sidebar").isOpen))
-        storageItem("sidebar").isOpen?
-          document.getElementById("Playing").classList.remove("openSidebar") :
-          document.getElementById("Playing").classList.add("openSidebar")
-      } else if(event.key === "w") {
-        ipcRenderer.send("end", [global.id])
-      }
+    if(event.key === "Escape") { //Back to main
+      if(isFullScreen()) {
+        fullScreenToggle(false)
+      } else root.render(<App />)
     }
   }
-  
-  if(event.key === "Escape") { //Back to main
-    if(isFullScreen()) {
-      fullScreenToggle(false)
-    } else root.render(<App />)
+  if(event.ctrlKey) {
+    if(event.key === "w") {
+      ipcRenderer.send("end", [global.id])
+    }
   }
-})
-
-document.body.addEventListener("mousedown", (event) => {
-  const menu = document.getElementById("MoreMenu")
-  if(!menu) return
-  if(event.target.id === "MoreMenu") return
-  else if(event.target.parentElement.id === "MoreMenu") return
-  document.getElementById("MoreMenu").style.transform = "scale(1, 0)"
 })
 
 setInterval(() => {
@@ -116,6 +97,7 @@ ipcRenderer.on(ALERT, (event, args) => {
 export function alertText(message, isRed) {
   const alertDiv = document.getElementById("alert")
   const alert = document.createElement("span")
+  if(12 <= alertDiv.children.length) alertDiv.children[0].remove()
   alert.innerText = message
   alert.classList.add("alertItem")
   if(isRed) alert.classList.add("red")

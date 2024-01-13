@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from "styled-components";
 import { Duration, durationFormat } from "../../../modules";
 import { CLIP } from "../../../constants";
@@ -19,6 +19,9 @@ const ClipDiv = styled.div`
   align-items: center;
   transition: 0.3s;
   /* transform: scale(1, 0); */
+  &.opend {
+    height: 275px;
+  }
 `
 
 //Top
@@ -31,14 +34,15 @@ const Top = styled.div`
   border-bottom: #525763 2px solid;
 `
 const Title = styled.h1`
-  font-size: 2vw;
+  font-size: 1.25vw;
+  margin: 0.25vh;
 `
 const Close = styled.button`
   margin: 0;
   width: 30px;
   height: 30px;
   background-color: #00000000;
-  font-size: 3vw;
+  font-size: 2vw;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -49,9 +53,10 @@ const SaveName = styled.input`
   width: 95%;
   height: 25px;
   background: #00000044;
-  border-bottom: #ffffff 1px solid;
   border-radius: 3px;
   font-size: 15px;
+  padding: 1vw;
+  padding-left: 0.5vw;
 `
 
 //Middle
@@ -59,7 +64,7 @@ const Middle = styled.div`
   display: flex;
   width: 100%;
   height: 82px;
-  justify-content: space-around;
+  justify-content: space-evenly;
 `
 const TimeDiv = styled.div`
   width: 26%;
@@ -111,13 +116,18 @@ const Alert = styled.span`
   opacity: 0;
 `
 const Create = styled.button`
-  border-radius: 10px;
-  background-color: #00B2FF;
+  width: 2vw;
+  height: 2vw;
+  border-radius: 0;
+  /* background-color: #c7c7c7; */
   color: black;
   font-weight: 700;
   font-size: 20px;
-  height: 35px;
+  /* height: 35px; */
   margin: 0;
+  margin-right: 2vw;
+  background: url("images/download.svg") no-repeat left center;
+  background-size: 100% 100%;
 `
 
 let slowRemove = null
@@ -135,9 +145,21 @@ function alert(message) {
 }
 function Clip(props) {
   const [saveName, setsaveName] = useState("{Title}_{Date}-{Time}.mp4")
+  const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    function openToggle(event) {
+      if(event.ctrlKey && event.key === "c") {
+        event.preventDefault()
+        setIsOpen(!isOpen)
+      }
+    }
+    document.addEventListener("keydown", openToggle)
+    return () => document.removeEventListener("keydown", openToggle)
+  }, [isOpen])
 
   return (
-    <ClipDiv id="ClipDiv">
+    <ClipDiv id="ClipDiv" className={isOpen? "opend" : ""}>
       <Top>
         <Title>클립 생성</Title>
         <Close onClick={() => {
@@ -164,7 +186,7 @@ function Clip(props) {
           }
           ipcRenderer.send(CLIP, [props.videoPath, oneTime.inSeconds(), twoTime.inSeconds(), document.getElementById("ClipSaveName").value])
           alertText("클립 생성을 시작합니다.")
-        }}>생성하기</Create>
+        }}></Create>
       </Bottom>
     </ClipDiv>
   );

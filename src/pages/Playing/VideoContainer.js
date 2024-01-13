@@ -1,6 +1,6 @@
 import ReactPlayer from "react-player"
 import styled from "styled-components"
-import "./VideoController.css"
+import "./VideoContainer.css"
 import { useEffect, useState } from "react"
 import { setStorage, storageItem } from "../../modules"
 import { Duration } from "../../modules"
@@ -49,9 +49,11 @@ const Left = styled.div`
 `
 
 const PlayButton = styled.button`
-  background-image: url("images/pause.png");
+  background: url("images/pause.svg") no-repeat center center;
+  background-size: 100% 120%;
   &.paused {
-    background-image: url("images/play.png");
+    background: url("images/play.svg") no-repeat center center;
+    background-size: 100% 100%;
   }
 `
 
@@ -60,26 +62,27 @@ const VolumeDiv = styled.div`
   align-items: center;
 `
 const VolumeButton = styled.button`
-  /* background-image: url("images/volume-high.png"); */
   &[data-shape="none"] {
-    background-image: url("images/volume-none.png");
+    background: url("images/volume-none.svg") no-repeat left center;
+    background-size: 90% 100%;
   }
   &[data-shape="off"] {
-      background-image: url("images/volume-off.png");
+    background: url("images/volume-off.svg") no-repeat left center;
+    background-size: 50% 100%;
   }
   &[data-shape="low"] {
-      background-image: url("images/volume-low.png");
+    background: url("images/volume-low.svg") no-repeat left center;
+    background-size: 70% 100%;
   }
   &[data-shape="high"] {
-      background-image: url("images/volume-high.png");
+    background: url("images/volume-high.svg") no-repeat left center;
+    background-size: 100% 100%;
   }
 `
 
 const VolumeInput = styled.input`
   height: 7px;
   background: linear-gradient(to right, ${SliderColor} 0%, ${SliderColor} 50%, #ececec 50%, #ececec 100%);
-  /* background: #ececec; */
-  transition: background 450ms ease-in;
   -webkit-appearance: none;
   appearance: none;
   border-radius: 100px;
@@ -103,7 +106,8 @@ const Right = styled.div`
   }
 `
 const MoreButton = styled.button`
-  background-image: url("images/more.png");
+  background: url("images/more.svg") no-repeat left center;
+  background-size: 100% 100%;
 `
 const FullButton = styled.button`
   background-image: url("images/full.png");
@@ -129,7 +133,6 @@ const CurrentBarInput = styled.input`
   /* height: 50%; */
   position: absolute;
   background: linear-gradient(to right, ${SliderColor} 0%, ${SliderColor} 50%, #ececec 50%, #ececec 100%);
-  transition: background 450ms ease-in;
   -webkit-appearance: none;
   appearance: none;
   border-radius: 100px;
@@ -164,6 +167,9 @@ const MoreMenu = styled.div`
   padding-top: 1%;
   padding-bottom: 1%;
   transform: scale(1, 0);
+  &.opend {
+    transform: scale(1, 1);
+  }
 `
 const MoreMenuItem = styled.button`
   padding: 8px;
@@ -179,43 +185,48 @@ const MoreMenuItem = styled.button`
 const getVideo = () => document.getElementsByTagName("video")[0]
 
 let noControllTicks = 0
-setInterval(() => {
-  const video = getVideo()
-  if(!video) return
 
-  //Play Bar
-  document.getElementById("currentTime").innerText = `${(new Duration(video.currentTime)).stringFormat()} / ${(new Duration(video.duration)).stringFormat()}`
-  const playBarInput = document.getElementById("playBarInput")
-  playBarInput.value = video.currentTime/video.duration*10000
-  var gradient_value = 100 / playBarInput.attributes.max.value;
-  playBarInput.style.background = `linear-gradient(to right, ${SliderColor} 0%, ${SliderColor} `+gradient_value * playBarInput.value +'%, #ececec ' +gradient_value *  playBarInput.value + '%, #ececec 100%)';
-  
-  //Volume
-  const volumeInput = document.getElementById("volume")
-  if(volumeInput) volumeInput.style.background = `linear-gradient(to right, ${SliderColor} 0%, ${SliderColor} `+ volumeInput.value +'%, #ececec ' + volumeInput.value + '%, #ececec 100%)';
+export default function VideoContainer(props) {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const video = getVideo()
+      if(!video) return
+    
+      //Play Bar
+      const playBarInput = document.getElementById("playBarInput")
+      var gradient_value = 100 / playBarInput.attributes.max.value
+      playBarInput.style.background = `linear-gradient(to right, ${SliderColor} 0%, ${SliderColor} `+gradient_value * playBarInput.value +'%, #ececec ' +gradient_value *  playBarInput.value + '%, #ececec 100%)'
+      
+      //Volume
+      const volumeInput = document.getElementById("volume")
+      if(volumeInput) volumeInput.style.background = `linear-gradient(to right, ${SliderColor} 0%, ${SliderColor} `+ volumeInput.value +'%, #ececec ' + volumeInput.value + '%, #ececec 100%)'
+    
+      const videoDiv = document.getElementById("VideoDiv")
+      const controller = document.getElementById("videoController")
+      if(!videoDiv) return
+      if(!controller) return
+      isFullScreen()? document.getElementById("fullScreenBtn").classList.add("fullScreen") : document.getElementById("fullScreenBtn").classList.remove("fullScreen")
+      if(video.paused) noControllTicks = 150
+      if(noControllTicks === 0) {
+        controller.style.opacity = 0
+        // controller.style.pointerEvents = "none"
+        videoDiv.style.cursor = "none"
+      } else {
+        controller.style.opacity = 1
+        // controller.style.pointerEvents = "all"
+        videoDiv.style.cursor = ""
+        noControllTicks-=1
+      }
+    }, 10)
+    return () => clearInterval(interval)
+  }, [])
 
-  const videoDiv = document.getElementById("VideoDiv")
-  const controller = document.getElementById("videoController")
-  if(!videoDiv) return
-  if(!controller) return
-  isFullScreen()? document.getElementById("fullScreenBtn").classList.add("fullScreen") : document.getElementById("fullScreenBtn").classList.remove("fullScreen")
-  if(video.paused) noControllTicks = 150
-  if(noControllTicks === 0) {
-    controller.style.opacity = 0
-    // controller.style.pointerEvents = "none"
-    videoDiv.style.cursor = "none"
-  } else {
-    controller.style.opacity = 1
-    // controller.style.pointerEvents = "all"
-    videoDiv.style.cursor = ""
-    noControllTicks-=1
-  }
-}, 10)
-function VideoController(props) {
   const [volume, setvolume] = useState(storageItem("volume"))
 
   const [playing, setplaying] = useState(true)
   const [muted, setmuted] = useState(false)
+
+  const [currentTime, setCurrentTime] = useState(undefined)
 
   const [volumeShape, setvolumeShape] = useState("high")
   function setVolumeShape() {
@@ -227,6 +238,45 @@ function VideoController(props) {
     }
   }
 
+  //Key Event
+  useEffect(() => {
+    function keyEvent(event) {
+      if(document.activeElement.tagName === "VIDEO") event.preventDefault()
+      if(event.key === " ") {
+        event.preventDefault()
+        setplaying(!playing)
+      }
+      
+      const video = document.getElementsByTagName("video")[0]
+      if(event.key === "ArrowRight") { //Wind
+        video.currentTime += 5
+        noControllTicks = 150
+      } else if(event.key === "ArrowLeft") { //Rewind
+        video.currentTime -= 5
+        noControllTicks = 150
+      }
+      if(event.key === ".") { //Seek
+        video.currentTime += 0.01
+      } else if(event.key === ",") { //Rewind
+        video.currentTime -= 0.01
+      }
+    }
+    document.addEventListener("keydown", keyEvent)
+    return () => document.removeEventListener("keydown", keyEvent)
+  }, [playing])
+
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
+  useEffect(() => {
+    function moreMenuClose(event) {
+      if(event.target.id === "MoreMenu") return
+      if(event.target.id === "moreButton") return
+      else if(event.target.parentElement.id === "MoreMenu") return
+      setIsMoreOpen(false)
+    }
+    document.addEventListener("mousedown", moreMenuClose)
+    return () => document.removeEventListener("mousedown", moreMenuClose)
+  }, [isMoreOpen])
+
   useEffect(() => {
     setVolumeShape()
   }, [volume, muted, setVolumeShape])
@@ -234,82 +284,56 @@ function VideoController(props) {
   const [playBarInputValue, setplayBarInputValue] = useState(0)
 
   const [isPaused, setisPaused] = useState(undefined)
-  return <VideoDiv id="VideoDiv" 
+  return <VideoDiv id="VideoDiv"
     onMouseMove={() => { noControllTicks = 150 }}
     onClick={() => { noControllTicks = 150 }}
     onMouseLeave={() => { noControllTicks = 0 }}
   >
-    <ReactPlayer playing={playing} url={`${props.videoPath}`} width={"100%"} height={"100%"} volume={volume/100} 
-    // <ReactPlayer url={`${props.videoPath}`} width={"100%"} height={"100%"} volume={volume/100} 
-      onPause={(e) => {setplaying(false)}}
-      onPlay={(e) => {setplaying(true)}}
+    <ReactPlayer playing={playing} url={`${props.videoPath}`} width={"100%"} height={"100%"} volume={volume/100}
       muted={muted}
+      onProgress={(e) => {
+        setCurrentTime(e)
+        setplayBarInputValue(e.playedSeconds/e.loadedSeconds*10000)
+      }}
+      progressInterval={0}
       onClick={(event) => {
-        const video = event.target
-        var isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA
-        if(video.paused) {
-          if (isPlaying) return
-          video.play()
-          setplaying(!video.paused)
-        } else video.pause()
+        // setplaying(!playing)
+        setplaying(event.target.paused)
       }}
     />
     <ControllerDiv id="videoController">
       <Etc>
-        <MoreMenu id="MoreMenu">
+        <MoreMenu id="MoreMenu" className={isMoreOpen? "opend" : ""}>
           <MoreMenuItem onClick={() => { ipcRenderer.send(FRAME_SAVE, [props.videoPath, getVideo().currentTime]); alertText("동영상 프레임 저장을 시작합니다."); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>동영상 프레임 저장</MoreMenuItem>
           <MoreMenuItem onClick={() => { ipcRenderer.send(FRAME_COPY, [props.videoPath, getVideo().currentTime]); alertText("동영상 프레임 복사를 시작합니다."); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>동영상 프레임 복사</MoreMenuItem>
           <MoreMenuItem onClick={() => { ipcRenderer.send(OPEN_SCREENSHOT_FOLDER); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>스크린샷 폴더 열기</MoreMenuItem>
-          <MoreMenuItem onClick={() => {
-            const isOpen = document.getElementById("ClipDiv").style.height === "275px"
-            if(isOpen) {
-              document.getElementById("ClipDiv").style.height = "0px"
-              document.getElementById("ClipDiv").style.borderBottom = "none"
-            } else {
-              document.getElementById("ClipDiv").style.height = "275px"
-              document.getElementById("ClipDiv").style.borderBottom = "#525763 2px solid"
-            }
-            document.getElementById("MoreMenu").style.transform = "scale(1, 0)"
-          }}>클립 생성창 토글</MoreMenuItem>
           <MoreMenuItem onClick={() => { ipcRenderer.send(OPEN_CLIP_FOLDER); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>클립 폴더 열기</MoreMenuItem>
         </MoreMenu>
       </Etc>
       <PlayBar id="playBar">
-        <CurrentBarInput id="playBarInput" type={"range"} min={"0"} max={"10000"} value={playBarInputValue} 
+        <CurrentBarInput id="playBarInput" type={"range"} min={"0"} max={"10000"} value={playBarInputValue}
         onChange={(event) => {
           const video = getVideo()
           if(!video) return
-          if(isPaused === undefined) {
-            setisPaused(video.paused)
-          }
-          var isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
-          if(isPlaying) {
-            video.pause()
-          }
+          if(video.readyState === 0) return
+          if(isPaused === undefined) setisPaused(video.paused)
+          const isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
+          if(isPlaying) setplaying(false)
           video.currentTime = (video.duration*(event.target.value/100))/100
           setplayBarInputValue(video.currentTime/video.duration*10000)
         }} onClickCapture={(e) => {
           const video = getVideo()
           if(!video) return
-          var isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
+          const isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
           if (!isPlaying) {
-            if(isPaused === false) video.play()
+            if(isPaused === false) setplaying(true)
             setisPaused(undefined)
           }
         }} />
       </PlayBar>
       <Controller>
         <Left>
-          <PlayButton className={`controlIcon ${playing? "" : "paused"}`} onClick={() => {
-            const video = getVideo()
-            if(!video) return
-            var isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
-            if(video.paused) {
-              if (isPlaying) return
-              video.play()
-              setplaying(!video.paused)
-            } else video.pause()
-          }}/>
+          <PlayButton className={`controlIcon ${playing? "" : "paused"}`} onClick={() => {setplaying(!playing)}}/>
           <VolumeDiv id="VolumeDiv" className={muted? "" : "canFold"}>
             <VolumeButton id="volumeBtn" className="controlIcon" data-shape={volumeShape} onClick={() => {
               setmuted(!muted)
@@ -322,12 +346,12 @@ function VideoController(props) {
               }}
             />
           </VolumeDiv>
-          <span id="currentTime">00:00 / 00:00</span>
+          <span id="currentTime">{currentTime? `${(new Duration(currentTime.playedSeconds)).stringFormat()} / ${(new Duration(currentTime.loadedSeconds)).stringFormat()}`
+          : "00:00 / 00:00"
+          }</span>
         </Left>
         <Right>
-          <MoreButton className={`controlIcon`} onClick={() => {
-            document.getElementById("MoreMenu").style.transform = "scale(1, 1)"
-          }}></MoreButton>
+          <MoreButton id="moreButton" className={`controlIcon`} onClick={(e) => {setIsMoreOpen(!isMoreOpen)}}></MoreButton>
           <FullButton id={"fullScreenBtn"} className={`controlIcon`} onClick={(event) => {
             const isNowFull = fullScreenToggle()
             isNowFull? document.getElementById("Playing").classList.remove("fullScreen") : document.getElementById("Playing").classList.add("fullScreen")
@@ -337,5 +361,3 @@ function VideoController(props) {
     </ControllerDiv>
   </VideoDiv>
 }
-
-export default VideoController

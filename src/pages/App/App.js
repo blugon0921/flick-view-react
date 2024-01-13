@@ -1,6 +1,6 @@
+import "./App.css"
 import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
-import "./App.css"
 import { OPEN_FILE, OPEN_VIDEO } from "../../constants";
 import { playVideo } from "../..";
 import mime from "mime";
@@ -33,47 +33,46 @@ const videoExtensions = [
   "mkv",
 ]
 
+
+
+let dropBox = document.getElementById("root")
+
+document.body.addEventListener("drop", (event) => {
+  // if(isOpenHelp()) return
+  event.preventDefault()
+  if(!event.dataTransfer.files) return
+  const file = event.dataTransfer.files[0]
+  if(file === undefined) return
+  dropBox.classList.remove("active")
+  if(mime.getType(file.path).startsWith("video")) {
+    playVideo(file.path, false)
+  } else {
+    dropBox.classList.add("wrong")
+    setTimeout(() => {
+      dropBox.classList.remove("wrong")
+    }, 500)
+  }
+})
+
+document.body.addEventListener("dragover", (e) => {
+  e.preventDefault()
+})
+
+document.body.addEventListener("dragenter", (e) => {
+  e.preventDefault()
+  dropBox.classList.add("active")
+})
+
+document.body.addEventListener("dragleave", (e) => {
+  e.preventDefault()
+  dropBox.classList.remove("active")
+})
 function App() {
   document.title = `Flick View`
 
-  useEffect(() => {
-    let dropBox = document.getElementById("root")
-
-    document.body.addEventListener("drop", (event) => {
-        // if(isOpenHelp()) return
-        event.preventDefault()
-        if(!event.dataTransfer.files) return
-        const file = event.dataTransfer.files[0]
-        if(file === undefined) return
-        dropBox.classList.remove("active")
-        if(mime.getType(file.path).startsWith("video")) {
-          playVideo(file.path, false)
-        } else {
-          dropBox.classList.add("wrong")
-          setTimeout(() => {
-            dropBox.classList.remove("wrong")
-          }, 500)
-        }
-    })
-
-    document.body.addEventListener("dragover", (e) => {
-        e.preventDefault()
-    })
-
-    document.body.addEventListener("dragenter", (e) => {
-        e.preventDefault()
-        dropBox.classList.add("active")
-    })
-
-    document.body.addEventListener("dragleave", (e) => {
-        e.preventDefault()
-        dropBox.classList.remove("active")
-    })
-  }, [])
-
   return (
     <AppDiv id="App">
-      <Version>2.0.0</Version>
+      <Version>2.0.1</Version>
       <h1 className="dad text">드래그 앤 드롭</h1>
       <h1 className="or text">OR</h1>
       <button id="openBtn" onClick={() => {

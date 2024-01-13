@@ -5,9 +5,18 @@ const url = require('url')
 const { ffmpeg, AppData, asyncFfprobe } = require("./electronModule")
 const fs = require("fs")
 
-if(!fs.existsSync(AppData)) {
-    fs.mkdirSync(AppData)
-}
+
+/*
+2.0.1
+
+전체화면에서 사이드바 토글이 되던 버그 수정
+동영상이 로딩중일때 재생바를 클릭할 수 있던 버그 수정
+사이드바 밑에 빈공간이 생기던 버그 수정
+클립 생성창 토글 방식을 메뉴에서 Ctrl+C 단축키로 변경
+창 최소 크기 960x540으로 변경
+*/
+
+if(!fs.existsSync(AppData)) fs.mkdirSync(AppData)
 const isFirst = app.requestSingleInstanceLock()
 if(!isFirst) {
     app.quit()
@@ -21,12 +30,12 @@ isDev? true : Menu.setApplicationMenu(false) //Off Menu
 function createWindow(argv, openIndex) {
     const primaryDisplay = screen.getAllDisplays()[0]
     const { width, height } = primaryDisplay.size
-    
+
     const win = new BrowserWindow({
         width: Math.ceil(width*(1547/1920)), //1920기준 1547
         height: Math.ceil(height*(900/1080)), //1080기준 900
-        minWidth: Math.ceil(width*(845/1920)), //1920기준 845
-        minHeight: Math.ceil(height*(492/1080)), //1080기준 492
+        minWidth: Math.ceil(width*(960/1920)), //1920기준 960
+        minHeight: Math.ceil(height*(540/1080)), //1080기준 540
         maxWidth: width, //1920기준 1920
         maxHeight: height, //1080기준 1080
         center: true,

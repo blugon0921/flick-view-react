@@ -25,7 +25,7 @@ const Bottom = styled.div`
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   transform: translate(0, -15px);
-  box-shadow: 0px 1px 8px 10px #FFFFFF30;
+  transform: scale(1, 1.0165) translate(0, -10px);
 `
 
 const VideoInfoContainer = styled.div`
@@ -36,6 +36,9 @@ const VideoInfoContainer = styled.div`
   justify-content: space-between;
   padding: 2%;
   border-bottom: #525763 2px solid;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  box-shadow: 0px 1px 8px 10px #FFFFFF30;
 `
 
 const Title = styled.h1`
@@ -50,9 +53,7 @@ const InfoText = styled.span`
 
 
 function Sidebar(props) {
-  // console.log(AppData)
   const [thumbnail, setThumbnail] = useState("images/unloadedThumbnail.png")
-  // const [thumbnail, setThumbnail] = useState(`${thubmnailsFolder}/${basename(props.videoPath)}.png`)
   if(!fs.existsSync(`${thubmnailsFolder}/${basename(props.videoPath)}.png`)) {
     ipcRenderer.send(CREATE_THUMBNAIL, [props.videoPath])
   }

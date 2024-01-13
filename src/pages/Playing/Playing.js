@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 import Sidebar from "./Sidebar/Sidebar";
 import ResizeBar from "./Sidebar/ResizeBar";
-import { basename, storageItem } from "../../modules"
-import VideoController from "./VideoController";
+import { basename, setInValue, setStorage, storageItem } from "../../modules"
+import VideoContainer from "./VideoContainer";
+import { isFullScreen } from "../..";
 
 // const { ipcRenderer } = window.require("electron")
 
@@ -22,10 +23,27 @@ const PlayingDiv = styled.div`
 
 function Playing(props) {
   // console.log(props.videoPath)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(storageItem("sidebar").isOpen? "" : "openSidebar")
   document.title = `Flick View | ${basename(props.videoPath)}`
 
-  return <PlayingDiv id={`Playing`} className={storageItem("sidebar").isOpen? "" : "openSidebar"}>
-    <VideoController videoPath={props.videoPath}/>
+  useEffect(() => {
+    function sidebarToggle(event) {
+      if(!document.getElementsByTagName("video")[0]) return
+      if(event.ctrlKey) {
+        if(event.key === "s") {
+          if(isFullScreen()) return
+          event.preventDefault()
+          setStorage("sidebar", setInValue(storageItem("sidebar"), "isOpen", !storageItem("sidebar").isOpen))
+          setIsSidebarOpen(storageItem("sidebar").isOpen)
+        }
+      }
+    }
+    document.addEventListener("keydown", sidebarToggle)
+    return () => document.removeEventListener("keydown", sidebarToggle)
+  }, [])
+
+  return <PlayingDiv id={`Playing`} className={isSidebarOpen}>
+    <VideoContainer videoPath={props.videoPath}/>
     <ResizeBar></ResizeBar>
     <Sidebar id={"Sidebar"} videoPath={props.videoPath} />
   </PlayingDiv>
