@@ -21,7 +21,7 @@ const PlayingDiv = styled.div`
   }
 `
 
-function Playing(props) {
+export default function Playing(props) {
   // console.log(props.videoPath)
   const [isSidebarOpen, setIsSidebarOpen] = useState(storageItem("sidebar").isOpen? "" : "openSidebar")
   document.title = `Flick View | ${basename(props.videoPath)}`
@@ -48,5 +48,3 @@ function Playing(props) {
     <Sidebar id={"Sidebar"} videoPath={props.videoPath} />
   </PlayingDiv>
 }
-
-export default Playing

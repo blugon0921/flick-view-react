@@ -143,7 +143,7 @@ function alert(message) {
     }
   }, 5)
 }
-function Clip(props) {
+export default function Clip(props) {
   const [saveName, setsaveName] = useState("{Title}_{Date}-{Time}.mp4")
   const [isOpen, setIsOpen] = useState(false)
 
@@ -209,6 +209,3 @@ function Time(props) {
     </TimeDiv>
   )
 }
-
-
-export default Clip

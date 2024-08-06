@@ -26,7 +26,7 @@ const ControllerDiv = styled.div`
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
-  background: linear-gradient(to top, black, #00000000);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), #00000000);
   transition: 0.2s;
   padding: 1vh;
   opacity: 0;
@@ -208,11 +208,11 @@ export default function VideoContainer(props) {
       isFullScreen()? document.getElementById("fullScreenBtn").classList.add("fullScreen") : document.getElementById("fullScreenBtn").classList.remove("fullScreen")
       if(video.paused) noControllTicks = 150
       if(noControllTicks === 0) {
-        controller.style.opacity = 0
+        controller.style.opacity = "0"
         // controller.style.pointerEvents = "none"
         videoDiv.style.cursor = "none"
       } else {
-        controller.style.opacity = 1
+        controller.style.opacity = "1"
         // controller.style.pointerEvents = "all"
         videoDiv.style.cursor = ""
         noControllTicks-=1
@@ -221,10 +221,10 @@ export default function VideoContainer(props) {
     return () => clearInterval(interval)
   }, [])
 
-  const [volume, setvolume] = useState(storageItem("volume"))
+  const [volume, setVolume] = useState(storageItem("volume"))
 
-  const [playing, setplaying] = useState(true)
-  const [muted, setmuted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [muted, setMuted] = useState(false)
 
   const [currentTime, setCurrentTime] = useState(undefined)
 
@@ -233,7 +233,7 @@ export default function VideoContainer(props) {
     if(muted) setvolumeShape("none")
     else {
       if(50 <= volume) setvolumeShape("high")
-      else if(volume != 0 && volume != 1) setvolumeShape("low")
+      else if(volume !== 0 && volume !== 1) setvolumeShape("low")
       else setvolumeShape("off")
     }
   }
@@ -244,7 +244,7 @@ export default function VideoContainer(props) {
       if(document.activeElement.tagName === "VIDEO") event.preventDefault()
       if(event.key === " ") {
         event.preventDefault()
-        setplaying(!playing)
+        setIsPlaying(!isPlaying)
       }
       
       const video = document.getElementsByTagName("video")[0]
@@ -263,7 +263,7 @@ export default function VideoContainer(props) {
     }
     document.addEventListener("keydown", keyEvent)
     return () => document.removeEventListener("keydown", keyEvent)
-  }, [playing])
+  }, [isPlaying])
 
   const [isMoreOpen, setIsMoreOpen] = useState(false)
   useEffect(() => {
@@ -281,33 +281,81 @@ export default function VideoContainer(props) {
     setVolumeShape()
   }, [volume, muted, setVolumeShape])
 
-  const [playBarInputValue, setplayBarInputValue] = useState(0)
+  const [playBarInputValue, setPlayBarInputValue] = useState(0)
 
-  const [isPaused, setisPaused] = useState(undefined)
+  const [isPaused, setIsPaused] = useState(undefined)
+  const [isPip, setIsPip] = useState(false)
+  const moreItems = [
+    {
+      text: "동영상 프레임 저장",
+      onClick: () => {
+        ipcRenderer.send(FRAME_SAVE, [props.videoPath, getVideo().currentTime])
+        alertText("동영상 프레임 저장을 시작합니다.")
+      }
+    },
+    {
+      text: "동영상 프레임 복사",
+      onClick: () => {
+        ipcRenderer.send(FRAME_COPY, [props.videoPath, getVideo().currentTime])
+        alertText("동영상 프레임 복사를 시작합니다.")
+      }
+    },
+    {
+      text: "스크린샷 폴더 열기",
+      onClick: () => { ipcRenderer.send(OPEN_SCREENSHOT_FOLDER) }
+    },
+    {
+      text: "클립 폴더 열기",
+      onClick: () => { ipcRenderer.send(OPEN_CLIP_FOLDER) }
+    },
+    {
+      text: "PIP모드",
+      onClick: () => { setIsPip(!isPip) }
+    }
+  ]
+
   return <VideoDiv id="VideoDiv"
     onMouseMove={() => { noControllTicks = 150 }}
     onClick={() => { noControllTicks = 150 }}
     onMouseLeave={() => { noControllTicks = 0 }}
   >
-    <ReactPlayer playing={playing} url={`${props.videoPath}`} width={"100%"} height={"100%"} volume={volume/100}
+    <ReactPlayer playing={isPlaying} url={`${props.videoPath}`} width={"100%"} height={"100%"} volume={volume/100} pip={isPip}
+      onPause={() => {
+        if(isPip) {
+          setIsPlaying(false)
+          setIsPaused(true)
+        }
+      }}
+      onPlay={() => {
+        if(isPip) {
+          setIsPlaying(true)
+          setIsPaused(false)
+        }
+      }}
       muted={muted}
       onProgress={(e) => {
         setCurrentTime(e)
-        setplayBarInputValue(e.playedSeconds/e.loadedSeconds*10000)
+        setPlayBarInputValue(e.playedSeconds/e.loadedSeconds*10000)
       }}
       progressInterval={0}
       onClick={(event) => {
         // setplaying(!playing)
-        setplaying(event.target.paused)
+        setIsPlaying(event.target.paused)
       }}
     />
     <ControllerDiv id="videoController">
       <Etc>
         <MoreMenu id="MoreMenu" className={isMoreOpen? "opend" : ""}>
-          <MoreMenuItem onClick={() => { ipcRenderer.send(FRAME_SAVE, [props.videoPath, getVideo().currentTime]); alertText("동영상 프레임 저장을 시작합니다."); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>동영상 프레임 저장</MoreMenuItem>
-          <MoreMenuItem onClick={() => { ipcRenderer.send(FRAME_COPY, [props.videoPath, getVideo().currentTime]); alertText("동영상 프레임 복사를 시작합니다."); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>동영상 프레임 복사</MoreMenuItem>
-          <MoreMenuItem onClick={() => { ipcRenderer.send(OPEN_SCREENSHOT_FOLDER); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>스크린샷 폴더 열기</MoreMenuItem>
-          <MoreMenuItem onClick={() => { ipcRenderer.send(OPEN_CLIP_FOLDER); document.getElementById("MoreMenu").style.transform = "scale(1, 0)" }}>클립 폴더 열기</MoreMenuItem>
+          {
+            moreItems.map((value) => {
+              return (
+                  <MoreMenuItem onClick={() => {
+                    value.onClick()
+                    setIsMoreOpen(false)
+                  }}>{value.text}</MoreMenuItem>
+              )
+            })
+          }
         </MoreMenu>
       </Etc>
       <PlayBar id="playBar">
@@ -316,32 +364,32 @@ export default function VideoContainer(props) {
           const video = getVideo()
           if(!video) return
           if(video.readyState === 0) return
-          if(isPaused === undefined) setisPaused(video.paused)
+          if(isPaused === undefined) setIsPaused(video.paused)
           const isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
-          if(isPlaying) setplaying(false)
+          if(isPlaying) setIsPlaying(false)
           video.currentTime = (video.duration*(event.target.value/100))/100
-          setplayBarInputValue(video.currentTime/video.duration*10000)
+          setPlayBarInputValue(video.currentTime/video.duration*10000)
         }} onClickCapture={(e) => {
           const video = getVideo()
           if(!video) return
           const isPlaying = video.currentTime > 0 && !video.paused && !video.ended && video.readyState > video.HAVE_CURRENT_DATA;
           if (!isPlaying) {
-            if(isPaused === false) setplaying(true)
-            setisPaused(undefined)
+            if(isPaused === false) setIsPlaying(true)
+            setIsPaused(undefined)
           }
         }} />
       </PlayBar>
       <Controller>
         <Left>
-          <PlayButton className={`controlIcon ${playing? "" : "paused"}`} onClick={() => {setplaying(!playing)}}/>
+          <PlayButton className={`controlIcon ${isPlaying? "" : "paused"}`} onClick={() => {setIsPlaying(!isPlaying)}}/>
           <VolumeDiv id="VolumeDiv" className={muted? "" : "canFold"}>
             <VolumeButton id="volumeBtn" className="controlIcon" data-shape={volumeShape} onClick={() => {
-              setmuted(!muted)
+              setMuted(!muted)
             }}/>
             <VolumeInput id="volume" type="range" min="0" max="100" value={volume}
               onChange={(e) => {
                 const target = e.currentTarget
-                setvolume(target.value)
+                setVolume(target.value)
                 setStorage("volume", Number(target.value))
               }}
             />

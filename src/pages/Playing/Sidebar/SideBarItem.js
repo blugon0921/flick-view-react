@@ -80,7 +80,7 @@ const SideInfoText = styled.span`
   font-weight: 400;
 `
 
-function SidebarItem(props) {
+export default function SidebarItem(props) {
   let isNowPlaying = props.nowPlaying === props.videoPath
   let clazz = isNowPlaying? "nowPlaying" : ""
 
@@ -132,5 +132,3 @@ function SidebarItem(props) {
     </SidebarItemDiv>
   );
 }
-
-export default SidebarItem

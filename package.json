@@ -1,6 +1,6 @@
 {
   "name": "flick_view",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "author": "Blugon",
   "private": true,
   "main": "public/electron.js",
@@ -25,12 +25,12 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "bun-types": "latest",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
-    "electron": "^26.1.0",
+    "electron": "^29.0.1",
     "electron-builder": "^24.6.3",
-    "wait-on": "^7.0.1",
-    "bun-types": "latest"
+    "wait-on": "^7.0.1"
   },
   "scripts": {
     "react-start": "react-scripts start",

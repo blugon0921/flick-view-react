@@ -67,12 +67,12 @@ document.body.addEventListener("dragleave", (e) => {
   e.preventDefault()
   dropBox.classList.remove("active")
 })
-function App() {
+export default function App() {
   document.title = `Flick View`
 
   return (
     <AppDiv id="App">
-      <Version>2.0.1</Version>
+      <Version>2.0.3</Version>
       <h1 className="dad text">드래그 앤 드롭</h1>
       <h1 className="or text">OR</h1>
       <button id="openBtn" onClick={() => {
@@ -81,5 +81,3 @@ function App() {
     </AppDiv>
   )
 }
-
-export default App

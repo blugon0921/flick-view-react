@@ -10,7 +10,7 @@ const ResizeSidebar = styled.div`
 `
 
 let isClick = false
-function ResizeBar(props) {
+export default function ResizeBar(props) {
 
   useEffect(() => {
     document.getElementById("ResizeBar").addEventListener("mousedown", (event) => {
@@ -36,5 +36,3 @@ function ResizeBar(props) {
     <ResizeSidebar id="ResizeBar"></ResizeSidebar>
   )
 }
-
-export default ResizeBar

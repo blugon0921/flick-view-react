@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { styled } from 'styled-components'
-// import unloadedThumbnail from "images/unloadedThumbnail.png"
 import { CREATE_THUMBNAIL, VIDEOS_IN_PATH, VIDEOS_IN_PATH_RESPONSE, VIDEO_INFO, VIDEO_INFO_RESPONSE } from "../../../constants"
 import SidebarItem from "./SideBarItem"
 import { AppData, Duration, basename, storageItem } from "../../../modules"
@@ -12,7 +11,7 @@ const remote = window.require('@electron/remote');
 const thubmnailsFolder = `${AppData}/thumbnails`
 
 const SidebarDiv = styled.div`
-  width: 0%;
+  width: 0;
   max-width: 50%;
   height: 100%;
   box-sizing: border-box;
@@ -24,13 +23,12 @@ const Bottom = styled.div`
   background-color: rgb(39, 41, 46);
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
-  transform: translate(0, -15px);
-  transform: scale(1, 1.0165) translate(0, -10px);
+  transform: scale(1, 1.018) translate(0, -15px);
 `
 
 const VideoInfoContainer = styled.div`
   width: 100%;
-  min-height: 4vw;
+  min-height: 3.4vw;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,7 +36,8 @@ const VideoInfoContainer = styled.div`
   border-bottom: #525763 2px solid;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
-  box-shadow: 0px 1px 8px 10px #FFFFFF30;
+  box-shadow: 0 1px 5px 6px rgba(255, 255, 255, 0.2);
+  background-color: #27292E;
 `
 
 const Title = styled.h1`
@@ -52,7 +51,7 @@ const InfoText = styled.span`
 `
 
 
-function Sidebar(props) {
+export default function Sidebar(props) {
   const [thumbnail, setThumbnail] = useState("images/unloadedThumbnail.png")
   if(!fs.existsSync(`${thubmnailsFolder}/${basename(props.videoPath)}.png`)) {
     ipcRenderer.send(CREATE_THUMBNAIL, [props.videoPath])
@@ -105,5 +104,3 @@ function Sidebar(props) {
     </SidebarDiv>
   );
 }
-
-export default Sidebar
