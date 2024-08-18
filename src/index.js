@@ -11,14 +11,6 @@ const { ipcRenderer } = window.require("electron")
 
 let root = ReactDOM.createRoot(document.getElementById('root'))
 
-/*
-2.0.3
-
-pip모드 추가
-
-소신발언) 갈아엎고싶다
-*/
-
 
 // global.id = -1
 global.id = 0

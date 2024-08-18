@@ -1,6 +1,6 @@
 {
   "name": "flick_view",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "author": "Blugon",
   "private": true,
   "main": "public/electron.js",
@@ -14,38 +14,32 @@
     "electron-log": "^4.4.8",
     "electron-progressbar": "^2.1.0",
     "electron-updater": "^6.1.1",
+    "eslint-config-react-app": "^6.0.0",
     "ffmpeg-static-electron": "^2.0.3",
-    "fluent-ffmpeg": "^2.1.2",
+    "fluent-ffmpeg": "^2.1.3",
     "mime": "^3.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-player": "^2.12.0",
-    "react-scripts": "5.0.1",
+    "react-dom": "^18.3.1",
+    "react-player": "^2.16.0",
     "styled-components": "^6.0.7",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "bun-types": "latest",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
-    "electron": "^29.0.1",
+    "electron": "^31.2.0",
     "electron-builder": "^24.6.3",
+    "react-scripts": "^5.0.1",
     "wait-on": "^7.0.1"
   },
   "scripts": {
-    "react-start": "react-scripts start",
+    "react-start": "cross-env NODE_ENV=development BROWSER=none react-scripts start",
     "react-build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start": "concurrently \"cross-env NODE_ENV=development BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "electron .",
     "build": "npm run react-build && electron-builder build -c.extraMetadata.main=build/electron.js",
     "release": "npm run react-build && electron-builder --publish=always"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -120,6 +114,6 @@
     ]
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^3.9.10"
   }
 }

@@ -7,13 +7,12 @@ const fs = require("fs")
 
 
 /*
-2.0.1
+2.0.4
 
-전체화면에서 사이드바 토글이 되던 버그 수정
-동영상이 로딩중일때 재생바를 클릭할 수 있던 버그 수정
-사이드바 밑에 빈공간이 생기던 버그 수정
-클립 생성창 토글 방식을 메뉴에서 Ctrl+C 단축키로 변경
-창 최소 크기 960x540으로 변경
+비디오 코덱이 vp9일때 미리보기 이미지가 생성되지 않던 버그 수정
+파일 이름에 특수문자가 포함되어있을 때 더블클릭으로 열리지 않던 버그 수정 (왜 수정됐는진 모르겠는데 아무튼 됐으니까 이득)
+클립 생성 단축키 Ctrl+Shift+C로 변경
+
 */
 
 if(!fs.existsSync(AppData)) fs.mkdirSync(AppData)
@@ -59,8 +58,7 @@ function createWindow(argv, openIndex) {
         isDev? win.webContents.openDevTools() : false
         win.webContents.send("setId", [windows.length])
         windows.push(win)
-        // win.webContents.openDevTools()
-        if(process.platform == "win32" && 2 <= argv.length) {
+        if(process.platform === "win32" && 2 <= argv.length) {
             if(argv[openIndex] && argv[openIndex] !== ".") {
                 if(!fs.existsSync(argv[openIndex])) return
                 if(!videoExtensions.includes(path.extname(argv[openIndex]).replace(".", "").toLowerCase())) return
@@ -75,6 +73,7 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) {
         require("@electron/remote/main").initialize()
         require("./update")(app, createWindow(process.argv, 1))
+        console.log(process.argv)
     }
 })
 

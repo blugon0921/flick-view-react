@@ -149,7 +149,7 @@ export default function Clip(props) {
 
   useEffect(() => {
     function openToggle(event) {
-      if(event.ctrlKey && event.key === "c") {
+      if(event.ctrlKey && event.shiftKey && event.key === "C") {
         event.preventDefault()
         setIsOpen(!isOpen)
       }

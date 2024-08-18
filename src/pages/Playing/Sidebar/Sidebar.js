@@ -65,13 +65,13 @@ export default function Sidebar(props) {
 
   const [videoInfo, setVideoInfo] = useState("0×0 · 00:00")
   useEffect(() => {
-    ipcRenderer.on(`${VIDEO_INFO_RESPONSE}-1`, (event, args) => {
+    ipcRenderer.on(`${VIDEO_INFO_RESPONSE}${global.id}`, (event, args) => {
       const info = args[0]
       if(info.videoPath !== props.videoPath) return
       info.duration = new Duration(info.duration)
       setVideoInfo(`${info.size.width}×${info.size.height} · ${info.duration.stringFormat(false)}`)
     })
-    ipcRenderer.send(VIDEO_INFO, [props.videoPath, -1])
+    ipcRenderer.send(VIDEO_INFO, [props.videoPath, global.id])
   }, [props.videoPath])
 
   const [items, setItems] = useState([])
