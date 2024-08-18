@@ -63,6 +63,7 @@ export default function Sidebar(props) {
     }
   }, 1)
 
+  //동영상 정보
   const [videoInfo, setVideoInfo] = useState("0×0 · 00:00")
   useEffect(() => {
     ipcRenderer.on(`${VIDEO_INFO_RESPONSE}${global.id}`, (event, args) => {
@@ -74,6 +75,7 @@ export default function Sidebar(props) {
     ipcRenderer.send(VIDEO_INFO, [props.videoPath, global.id])
   }, [props.videoPath])
 
+  //사이드바 아이템 받아오기
   const [items, setItems] = useState([])
   useEffect(() => {
     ipcRenderer.on(VIDEOS_IN_PATH_RESPONSE, (event, paths) => {
@@ -82,9 +84,18 @@ export default function Sidebar(props) {
     ipcRenderer.send(VIDEOS_IN_PATH, [props.videoPath])
   }, [props.videoPath])
 
+  //사이드바 넓이 설정
+  const [width, setWidth] = useState(storageItem("sidebar").size)
+  useEffect(() => { //Resized
+    const interval = setInterval(() => {
+      if(width !== storageItem("sidebar").size) setWidth(storageItem("sidebar").size)
+    }, 1)
+    return () => clearInterval(interval)
+  }, [width])
+
   return (
     <SidebarDiv id="Sidebar" style={{
-      minWidth: `${storageItem("sidebar").size}vw`
+      minWidth: `${width}vw`
     }}>
       <Clip videoPath={props.videoPath} />
       <img id="Thumbnail" src={thumbnail} alt="Thumbnail.png" width={"100%"} />

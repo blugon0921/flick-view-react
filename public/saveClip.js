@@ -20,10 +20,10 @@ async function saveClip(ffmpeg, videoPath, startSeconds, endSeconds, savePath, s
             resolve(`${savePath}/${saveName}`)
         }).on("error", (err) => {
             reject(err)
-        })
-        .on("progress", (progress) => {
-            if(!event) return
-            const percent = ((durationFormat(progress.timemark).inSeconds()/partDuration)*100).toFixed(1)
+        }).on("progress", (progress) => {
+            const duration = durationFormat(progress.timemark)
+            if(!event || !duration) return
+            const percent = ((duration.inSeconds()/partDuration)*100).toFixed(1)
             event.sender.send(ALERT, [`${percent}%`])
             // console.log(`Processing: ${percent}% done`);
         })

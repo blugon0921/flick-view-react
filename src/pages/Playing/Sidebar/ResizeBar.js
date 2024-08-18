@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import {useEffect, useState} from "react"
 import { styled } from "styled-components"
 import { setInValue, setStorage, storageItem } from "../../../modules"
 
@@ -9,30 +9,36 @@ const ResizeSidebar = styled.div`
   cursor: ew-resize;
 `
 
-let isClick = false
 export default function ResizeBar(props) {
+  const [isClicking, setClicking] = useState(false)
 
   useEffect(() => {
-    document.getElementById("ResizeBar").addEventListener("mousedown", (event) => {
-      if(isClick) document.body.style.cursor = "ew-resize"
-      isClick = true
-    })
-    document.body.addEventListener("mouseup", (event) => {
+    function up(event) {
       document.body.style.cursor = ""
-      isClick = false
-    })
-    document.body.addEventListener("mousemove", (event) => {
-      if(!isClick) return
+      setClicking(false)
+    }
+    function move(event) {
+      if(!isClicking) return
       const clientWidth = document.body.clientWidth
       const width = event.clientX
-      const sideBarWidth = 100-parseFloat(width/clientWidth*100)
+      const sideBarWidth = 100-width/clientWidth*100
       if(sideBarWidth < 22 || 50 < sideBarWidth) return
-      document.getElementById("Sidebar").style.minWidth = `${sideBarWidth}vw`
       setStorage("sidebar", setInValue(storageItem("sidebar"), "size", sideBarWidth))
-    })
-  }, [])
+    }
+    document.addEventListener("mouseup", up)
+    document.addEventListener("mousemove", move)
+    return () => {
+      document.removeEventListener("mouseup", up)
+      document.removeEventListener("mousemove", move)
+    }
+  }, [isClicking])
   
   return (
-    <ResizeSidebar id="ResizeBar"></ResizeSidebar>
+    <ResizeSidebar id="ResizeBar"
+      onMouseDown={() => {
+        if(isClicking) document.body.style.cursor = "ew-resize"
+        setClicking(true)
+      }}
+    />
   )
 }

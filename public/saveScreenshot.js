@@ -1,5 +1,5 @@
 const { ipcMain, app, clipboard, shell } = require("electron")
-const { asyncFfprobe, AppData, basename } = require("./electronModule")
+const { asyncFfprobe, AppData, basename, PrettySize} = require("./electronModule")
 const { CREATE_THUMBNAIL, FRAME_SAVE, FRAME_COPY, OPEN_SCREENSHOT_FOLDER, ALERT } = require("./constants")
 const { Duration } = require("./duration")
 const fs = require("fs")
@@ -27,21 +27,32 @@ module.exports = {
     saveScreenshot: saveScreenshot,
 
     initialized: async (ffmpeg) => {
-        const thubmnailsFolder = path.join(AppData, "thumbnails")
+        const thumbnailsFolder = path.join(AppData, "thumbnails")
         ipcMain.on(CREATE_THUMBNAIL, async (event, args) => {
             const videoPath = args[0]
             const info = await asyncFfprobe(videoPath)
 
             const ratio = info.size.width/info.size.height
-            const height = 200
+            const height = 400
             let width = Math.floor(height*ratio)
-            saveScreenshot(ffmpeg, videoPath, info.duration.inSeconds()/2, thubmnailsFolder, `${basename(videoPath)}.png`, {
+            await saveScreenshot(ffmpeg, videoPath, info.duration.inSeconds() / 2, thumbnailsFolder, `${basename(videoPath)}.png`, {
                 width: width,
                 height: height
             })
         })
+        ipcMain.on("clearThumbnail", async (event, args) => {
+            const thumbnails = fs.readdirSync(thumbnailsFolder)
+            let size = 0
+            await thumbnails.forEach((filename) => {
+                const thumbnail = path.join(thumbnailsFolder, filename)
+                size += fs.statSync(thumbnail).size
+                fs.unlinkSync(thumbnail)
+            })
+            const pretty = PrettySize(size)
+            event.sender.send(ALERT, [`${pretty}를 확보했습니다`])
+        })
 
-        //Register Events
+        //Register Frame Events
         const screenshotFolder = path.join(AppData, "screenshot")
         ipcMain.on(FRAME_SAVE, async (event, args) => { //Frame Save
             const videoPath = args[0]
@@ -62,7 +73,7 @@ module.exports = {
                 width: info.size.width,
                 height: info.size.height
             }).then((savePath) => {
-                event.sender.send(ALERT, ["동영상 프레임을 저장했습니다."])
+                event.sender.send(ALERT, ["현재 프레임을 저장했습니다."])
             }).catch((error) => {
                 event.sender.send(ALERT, ["오류로 인해 동영상 프레임 저장에 실패했습니다.", true])
             })
@@ -79,7 +90,7 @@ module.exports = {
             }).then((savePath) => {
                 clipboard.writeImage(savePath)
                 fs.unlinkSync(savePath)
-                event.sender.send(ALERT, ["동영상 프레임을 복사했습니다."])
+                event.sender.send(ALERT, ["현재 프레임을 복사했습니다."])
             }).catch((error) => {
                 event.sender.send(ALERT, ["오류로 인해 동영상 프레임 복사에 실패했습니다.", true])
             })

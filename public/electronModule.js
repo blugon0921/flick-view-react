@@ -41,4 +41,15 @@ module.exports = {
     },
 
     AppData: path.join(app.getPath("appData"), "FlickView"),
+
+    PrettySize: (byte) => {
+        const kb = byte/1024
+        const mb = kb/1024
+        const gb = mb/1024
+        let size = `${Math.round(byte*100)/100}B`
+        if(1024 < byte) size = `${Math.round(kb*100)/100}KB`
+        if(1024 < kb) size = `${Math.round(mb*100)/100}MB`
+        if(1024 < mb) size = `${Math.round(gb*100)/100}GB`
+        return size
+    }
 }

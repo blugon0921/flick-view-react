@@ -30,36 +30,6 @@ if(!storageItem("volume")) {
   setStorage("volume", 50)
 }
 
-document.addEventListener("keydown", (event) => {
-  if(document.activeElement.tagName === "VIDEO") return
-  if(document.getElementsByTagName("video")[0]) {
-    if(event.key === "Escape") { //Back to main
-      if(isFullScreen()) {
-        fullScreenToggle(false)
-      } else root.render(<App />)
-    }
-  }
-  if(event.ctrlKey) {
-    if(event.key === "w") {
-      ipcRenderer.send("end", [global.id])
-    }
-  }
-})
-
-setInterval(() => {
-  const playing = document.getElementById("Playing")
-  const video = document.getElementsByTagName("video")[0]
-  if(video) video.blur()
-  if(document.getElementById("playBarInput")) document.getElementById("playBarInput").blur()
-  if(!playing) return
-  if(playing.classList.contains("fullScreen")) {
-    playing.style.minWidth = `calc(1${storageItem("sidebar").size}vw + 4px)`
-  } else {
-    if(storageItem("sidebar").isOpen) playing.style.minWidth = `100vw`
-    else playing.style.minWidth = `calc(1${storageItem("sidebar").size}vw + 4px)`
-  }
-}, 1)
-
 ipcRenderer.on(OPEN_VIDEO, (event, args) => {
   console.log(args[0])
   playVideo(args[0])
@@ -70,26 +40,6 @@ ipcRenderer.on("log", (event, args) => {
 })
 
 root.render(<App />)
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-// reportWebVitals()
-
-export function fullScreenToggle(bool) {
-  const playing = document.getElementById("Playing")
-  if(!playing) return
-  const isNowFull = playing.classList.contains("fullScreen")
-  if(bool !== undefined) {
-    if(bool == false) playing.classList.remove("fullScreen")
-    else if(bool == true) playing.classList.add("fullScreen")
-    ipcRenderer.send(FULL_SCREEN, [global.id, bool])
-  }
-  isNowFull? playing.classList.remove("fullScreen") : playing.classList.add("fullScreen")
-  ipcRenderer.send(FULL_SCREEN, [global.id, !isNowFull])
-  return isNowFull
-}
-
 
 ipcRenderer.on(ALERT, (event, args) => {
   alertText(args[0], args[1])
@@ -117,17 +67,9 @@ export function alertText(message, isRed) {
 }
 
 
-export function isFullScreen() {
-  const playing = document.getElementById("Playing")
-  if(!playing) return
-  return playing.classList.contains("fullScreen")
-}
-
-
 export function playVideo(path, isSide, data) {
   if(document.getElementsByTagName("video")[0]) {
-    if(decodeURI(document.getElementsByTagName("video")[0].src.replace("file:///", "")).replaceAll("\\", "/") === 
-    path.replaceAll("\\", "/")) {
+    if(decodeURI(document.getElementsByTagName("video")[0].src.replace("file:///", "")).replaceAll("\\", "/") === path.replaceAll("\\", "/")) {
       document.getElementsByTagName("video")[0].src = path
       return
     }
@@ -135,10 +77,10 @@ export function playVideo(path, isSide, data) {
   root.unmount()
   root = ReactDOM.createRoot(document.getElementById('root'))
   root.render(
-    <Playing videoPath={path} />
+    <Playing videoPath={path} root={root} />
   )
 
-  //사이드바 클릭일때 사이드바 위치 설정
+  //사이드바 클릭으로 재생했을때 사이드바 위치 설정
   if(isSide) {
     let count = -1
     ipcRenderer.once(VIDEOS_IN_PATH_RESPONSE, (event, paths) => {
@@ -146,7 +88,7 @@ export function playVideo(path, isSide, data) {
     })
     ipcRenderer.send(VIDEOS_IN_PATH, [path])
     let setSidebarOffset = setInterval(() => {
-      if(count != -1 && count === document.getElementById("SidebarItems").children.length-1) {
+      if(count !== -1 && count === document.getElementById("SidebarItems").children.length-1) {
         document.getElementById("Sidebar").scrollTo(0, data.offset+document.getElementById("Thumbnail").height)
         clearInterval(setSidebarOffset)
       }
