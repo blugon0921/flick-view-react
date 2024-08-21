@@ -78,7 +78,7 @@ export default function Playing(props) {
     }
     document.addEventListener("keydown", backToMain)
     return () => document.removeEventListener("keydown", backToMain)
-  }, [])
+  }, [isFullScreen])
 
   return <PlayingDiv
     id={`Playing`}

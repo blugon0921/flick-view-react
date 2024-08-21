@@ -7,13 +7,10 @@ const fs = require("fs")
 
 
 /*
-2.0.5
+2.0.6
 
-코드 최적화
-메뉴에 미리보기 이미지 지우기 추가
-미리보기 이미지 화질 증가
-클립을 생성할때 오류 알림창이 뜨는 버그 수정
-메뉴를 열었을때 동영상 조작창이 사라지지 않게 변경
+전체화면에서 ESC했을때 메인으로 가지는 버그 수정
+앱 실행후 로딩중일때 창 제목이 flick_view로 표시되던 버그 수정
 
 */
 
@@ -48,7 +45,8 @@ function createWindow(argv, openIndex) {
             webSecurity: false,
             // devTools: isDev,
             enableRemoteModule: true
-        }
+        },
+        title: "Flick View"
     })
     require("@electron/remote/main").enable(win.webContents)
 
