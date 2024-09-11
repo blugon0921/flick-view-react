@@ -7,10 +7,10 @@ const fs = require("fs")
 
 
 /*
-2.0.6
+2.0.7
 
-전체화면에서 ESC했을때 메인으로 가지는 버그 수정
-앱 실행후 로딩중일때 창 제목이 flick_view로 표시되던 버그 수정
+인터넷이 연결되어있지 않을 때 새로운 업데이트가 존재하는지 확인하는 버그 수정
+영상 재생이 완료되었을때 정지가 되지 않던 버그 수정
 
 */
 
@@ -69,11 +69,15 @@ function createWindow(argv, openIndex) {
     return win
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         require("@electron/remote/main").initialize()
-        require("./update")(app, createWindow(process.argv, 1))
-        console.log(process.argv)
+        if(await isInternetConnection()) {
+            require("./update")(app, createWindow(process.argv, 1))
+        } else {
+            createWindow(process.argv, 1)
+        }
+        // console.log(process.argv)
     }
 })
 
@@ -155,3 +159,12 @@ const videoExtensions = [
     "m4v",
     "mkv",
 ]
+
+async function isInternetConnection() {
+    return new Promise((resolve, reject) => {
+        require('dns').resolve('www.google.com', function (err) {
+            if (err) reject(false)
+            else resolve(true)
+        })
+    })
+}

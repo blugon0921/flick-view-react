@@ -347,6 +347,10 @@ export default function VideoContainer(props) {
       onProgress={(e) => {
         setCurrentTime(e)
         setPlayBarInputValue(e.playedSeconds/e.loadedSeconds*10000)
+        if(e.playedSeconds/e.loadedSeconds === 1) {
+          setPlaying(false)
+          setPaused(true)
+        }
       }}
       progressInterval={0}
       onClick={(event) => {
