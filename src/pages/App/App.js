@@ -72,7 +72,7 @@ export default function App() {
 
   return (
     <AppDiv id="App">
-      <Version>2.0.6</Version>
+      <Version>2.0.7</Version>
       <h1 className="dad text">드래그 앤 드롭</h1>
       <h1 className="or text">OR</h1>
       <button id="openBtn" onClick={() => {
