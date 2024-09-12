@@ -402,7 +402,10 @@ export default function VideoContainer(props) {
             if(isPaused === false) setPlaying(true)
             setPaused(undefined)
           }
-        }} />
+        }}
+        onFocus={(event) => {
+          event.target.blur()
+        }}/>
       </PlayBar>
       <Controller>
         <Left>
